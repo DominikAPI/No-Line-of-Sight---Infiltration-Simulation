@@ -5,19 +5,25 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private float speed = 5.0f;
-    [SerializeField] private float slideForce = 2.0f;
+    [SerializeField] private float speed;
+    [SerializeField] private float slideForce;
+    private readonly float slideCooldown = 2.0f;
+    private float timeSinceSlide = 2.0f;
+
     private PlayerInputActions playerInputActions;
     private Vector2 moveInput;
     private Vector2 lookInput;
+
     private Rigidbody2D rigidBody;
     private Camera mainCamera;
+    private PistolController gun;
 
     private void Awake()
     {
         playerInputActions = new PlayerInputActions();
         rigidBody = GetComponent<Rigidbody2D>();
         mainCamera = Camera.main;
+        gun = GetComponentInChildren<PistolController>();
     }
 
     private void OnEnable()
@@ -27,10 +33,12 @@ public class PlayerController : MonoBehaviour
         playerInputActions.Player.Slide.performed += PerformSlide;
         playerInputActions.Player.Look.performed += PerformLook;
         playerInputActions.Player.Look.canceled += PerformLook;
+        playerInputActions.Player.Attack.performed += PerformShoot;
 
         playerInputActions.Player.Move.Enable();
         playerInputActions.Player.Slide.Enable();
         playerInputActions.Player.Look.Enable();
+        playerInputActions.Player.Attack.Enable();
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -42,6 +50,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        timeSinceSlide += Time.deltaTime;
         HandleMovement();  
         HandleLook();
     }
@@ -76,9 +85,11 @@ public class PlayerController : MonoBehaviour
 
     private void PerformSlide(InputAction.CallbackContext context)
     {
+        if (timeSinceSlide < slideCooldown) return;
         Vector2 forceInput = moveInput == Vector2.zero ? Vector2.right : moveInput;
 
         rigidBody.AddForce(slideForce * forceInput, ForceMode2D.Impulse);
+        timeSinceSlide = 0f;
     }
 
     private void PerformLook(InputAction.CallbackContext context)
@@ -86,10 +97,16 @@ public class PlayerController : MonoBehaviour
         lookInput = context.ReadValue<Vector2>();
     }
 
+    private void PerformShoot(InputAction.CallbackContext context)
+    {
+        gun.Fire();
+    }
+
     private void OnDisable()
     {
         playerInputActions.Player.Move.Disable();
         playerInputActions.Player.Slide.Disable();
         playerInputActions.Player.Look.Disable();
+        playerInputActions.Player.Attack.Disable();
     }
 }
