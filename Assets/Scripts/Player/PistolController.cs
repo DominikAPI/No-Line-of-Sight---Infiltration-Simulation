@@ -16,9 +16,11 @@ public class PistolController : MonoBehaviour
         
     }
 
+    /// <summary>
+    /// Casts a ray from the  weapon's shooting point, if it hits something with an <see cref="IKillable"/> interface
+    /// </summary>
     public void Fire()
     {
-        Debug.Log("Shoot");
         RaycastHit2D hit = Physics2D.Raycast(firePoint.position, transform.right, range);
         if (!hit) return;
 

@@ -7,17 +7,11 @@ public class GunLaser : MonoBehaviour
     [SerializeField] private LayerMask layerMask;
     private LineRenderer lineRenderer;
 
-
     private void Awake()
     {
         lineRenderer = GetComponent<LineRenderer>();
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
 
     void Update()
     {

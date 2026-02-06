@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, IDetectable
 {
     [SerializeField] private float speed;
     [SerializeField] private float slideForce;
@@ -13,10 +13,12 @@ public class PlayerController : MonoBehaviour
     private PlayerInputActions playerInputActions;
     private Vector2 moveInput;
     private Vector2 lookInput;
+    private Vector2 previousLookInput;
 
     private Rigidbody2D rigidBody;
     private Camera mainCamera;
     private PistolController gun;
+    private PlayerDetectionResponse detectionResponse;
 
     private void Awake()
     {
@@ -24,15 +26,16 @@ public class PlayerController : MonoBehaviour
         rigidBody = GetComponent<Rigidbody2D>();
         mainCamera = Camera.main;
         gun = GetComponentInChildren<PistolController>();
+        detectionResponse = new PlayerDetectionResponse();
     }
 
     private void OnEnable()
     {
-        playerInputActions.Player.Move.performed += MovePlayer;
-        playerInputActions.Player.Move.canceled += MovePlayer;
+        playerInputActions.Player.Move.performed += GetMoveInput;
+        playerInputActions.Player.Move.canceled += GetMoveInput;
         playerInputActions.Player.Slide.performed += PerformSlide;
-        playerInputActions.Player.Look.performed += PerformLook;
-        playerInputActions.Player.Look.canceled += PerformLook;
+        playerInputActions.Player.Look.performed += GetLookInput;
+        playerInputActions.Player.Look.canceled += GetLookInput;
         playerInputActions.Player.Attack.performed += PerformShoot;
 
         playerInputActions.Player.Move.Enable();
@@ -55,6 +58,9 @@ public class PlayerController : MonoBehaviour
         HandleLook();
     }
 
+    /// <summary>
+    /// Moves the player based on the move input
+    /// </summary>
     private void HandleMovement()
     {
         Vector3 movement = (Vector3)moveInput;
@@ -65,12 +71,15 @@ public class PlayerController : MonoBehaviour
         transform.position += speed * Time.deltaTime * movement;
     }
 
+    /// <summary>
+    /// Rotates the player based on the mouse pointer's position on the screen
+    /// </summary>
     private void HandleLook()
     {
-        if (lookInput == Vector2.zero) return;
+        if (previousLookInput == lookInput) return;
 
         Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(lookInput);
-        mouseWorldPos.z = 0f;
+        mouseWorldPos.z = 0f;           //just to be sure
 
         Vector2 direction = mouseWorldPos - transform.position;
 
@@ -78,11 +87,15 @@ public class PlayerController : MonoBehaviour
         transform.rotation = Quaternion.Euler(0f, 0f, angle);
     }
 
-    private void MovePlayer(InputAction.CallbackContext context)
+    private void GetMoveInput(InputAction.CallbackContext context)
     {
         moveInput = context.ReadValue<Vector2>();
     }
 
+    /// <summary>
+    /// Slides the player
+    /// </summary>
+    /// <param name="context">Input action callback context</param>
     private void PerformSlide(InputAction.CallbackContext context)
     {
         if (timeSinceSlide < slideCooldown) return;
@@ -92,8 +105,9 @@ public class PlayerController : MonoBehaviour
         timeSinceSlide = 0f;
     }
 
-    private void PerformLook(InputAction.CallbackContext context)
+    private void GetLookInput(InputAction.CallbackContext context)
     {
+        previousLookInput = lookInput;
         lookInput = context.ReadValue<Vector2>();
     }
 
@@ -101,6 +115,8 @@ public class PlayerController : MonoBehaviour
     {
         gun.Fire();
     }
+
+    public DetectionResponse GetDetectionResponse() => detectionResponse;
 
     private void OnDisable()
     {
