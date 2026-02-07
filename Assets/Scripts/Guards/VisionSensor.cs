@@ -64,12 +64,12 @@ public class VisionSensor : MonoBehaviour
     }
 
     /// <summary>
-    /// 
+    /// Search for detectable objects withing a cone of vision
     /// </summary>
     /// <param name="range">Range of the rays</param>
     /// <param name="halfAngle">Half of the vision cone's apex angle</param>
     /// <param name="visionDirection">Main(centre) direction of thevision</param>
-    /// <returns></returns>
+    /// <returns>The list of the detected objects</returns>
     private List<IDetectable> TryDetectObjects(float range, float halfAngle, Vector2 visionDirection)
     {
         HashSet<IDetectable> results = new();
@@ -77,36 +77,13 @@ public class VisionSensor : MonoBehaviour
 
         for (float angle = -halfAngle; angle <= halfAngle; angle += step)
         {
-            Vector2 rayDirection = RotateVector(visionDirection, angle);
+            Vector2 rayDirection = MathHelper.RotateVector(visionDirection, angle);
 
             RaycastHit2D hit = Physics2D.Raycast(visionPoint.position, rayDirection, range, visionMask);
 
-            if (hit.collider != null)
-            {
-                IDetectable detectable = hit.collider.GetComponent<IDetectable>();
-
-                if (detectable != null) results.Add(detectable);
-            }          
+            if (hit.collider != null && hit.collider.TryGetComponent<IDetectable>(out var detectable)) results.Add(detectable);
         }
 
         return results.ToList();
-    }
-
-    /// <summary>
-    /// Rotates a Vector2 by the given angle
-    /// </summary>
-    /// <param name="vector">The vector to be rotated</param>
-    /// <param name="degrees">The rotation in degrees</param>
-    /// <returns>The rotated vector</returns>
-    private Vector2 RotateVector(Vector2 vector, float degrees)
-    {
-        float rad = degrees * Mathf.Deg2Rad;
-        float cos = Mathf.Cos(rad);
-        float sin = Mathf.Sin(rad);
-
-        return new Vector2(
-            vector.x * cos - vector.y * sin,
-            vector.x * sin + vector.y * cos
-        );
     }
 }

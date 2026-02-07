@@ -6,6 +6,7 @@ public class GuardController : MonoBehaviour, IKillable
 {
     private GuardEntity entity;
     private VisionSensor visionSensor;
+    private VisionMesh visionMesh;
     private readonly float checkFrequency = 0.1f;
     private float visibleTime = 0f;
 
@@ -21,12 +22,14 @@ public class GuardController : MonoBehaviour, IKillable
     private void Awake()
     {
         visionSensor = GetComponent<VisionSensor>();
+        visionMesh = GetComponentInChildren<VisionMesh>();
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        InvokeRepeating(nameof(DetectionCheck), 1f, checkFrequency);
+        InvokeRepeating(nameof(DetectionCheck), 0f, checkFrequency);
+        InvokeRepeating(nameof(UpdateVisionMesh), 0f, checkFrequency);
     }
 
     // Update is called once per frame
@@ -39,6 +42,7 @@ public class GuardController : MonoBehaviour, IKillable
     {   
         Debug.Log("Guard died");
         CancelInvoke();
+        visionMesh.DestroyVisionMesh();
     }
 
     /// <summary>
@@ -66,4 +70,6 @@ public class GuardController : MonoBehaviour, IKillable
                 entity.EnterAlertState(detectable, "Detected!");
         }
     }
+
+    private void UpdateVisionMesh() => visionMesh.ConstructVisionMesh(entity.DetectionRange, entity.HalfAngle);
 }

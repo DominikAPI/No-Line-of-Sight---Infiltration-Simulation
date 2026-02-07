@@ -18,7 +18,7 @@ public class PlayerController : MonoBehaviour, IDetectable
     private Rigidbody2D rigidBody;
     private Camera mainCamera;
     private PistolController gun;
-    private PlayerDetectionResponse detectionResponse;
+    private DetectionResponse detectionResponse;
 
     private void Awake()
     {
