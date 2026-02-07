@@ -4,9 +4,12 @@ using UnityEngine;
 [RequireComponent(typeof(VisionSensor))]
 public class GuardController : MonoBehaviour, IKillable
 {
+    [SerializeField] private GameObject corpse;
+    
     private GuardEntity entity;
     private VisionSensor visionSensor;
     private VisionMesh visionMesh;
+
     private readonly float checkFrequency = 0.1f;
     private float visibleTime = 0f;
 
@@ -23,6 +26,7 @@ public class GuardController : MonoBehaviour, IKillable
     {
         visionSensor = GetComponent<VisionSensor>();
         visionMesh = GetComponentInChildren<VisionMesh>();
+        corpse.SetActive(false);
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -43,6 +47,8 @@ public class GuardController : MonoBehaviour, IKillable
         Debug.Log("Guard died");
         CancelInvoke();
         visionMesh.DestroyVisionMesh();
+        corpse.SetActive(true);
+        gameObject.SetActive(false);
     }
 
     /// <summary>

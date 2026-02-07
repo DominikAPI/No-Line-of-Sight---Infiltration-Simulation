@@ -171,6 +171,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c107e4c57fa4d54893618ed7393b97c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GuardController
+  corpse: {fileID: 0}
 --- !u!114 &4122214427347556056
 MonoBehaviour:
   m_ObjectHideFlags: 0
