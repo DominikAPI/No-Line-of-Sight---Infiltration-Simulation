@@ -7,13 +7,20 @@ public class VisionMesh : MonoBehaviour
     [SerializeField] private LayerMask visionMask;
     private readonly int raysPerHalfAngle = 10;
     private MeshFilter meshFilter;
+    private MeshRenderer meshRenderer;
+    private Mesh mesh;
 
     private void Awake()
     {
         meshFilter = GetComponent<MeshFilter>();
+        meshRenderer = GetComponent<MeshRenderer>();
+        mesh = new Mesh();
     }
 
-    public void DestroyVisionMesh() => meshFilter.mesh = null;
+    public void DestroyVisionMesh()
+    {
+        meshRenderer.enabled = false;
+    }
 
     
     /// <summary>
@@ -23,7 +30,7 @@ public class VisionMesh : MonoBehaviour
     /// <param name="halfAngle">Half of the vision angle</param>
     public void ConstructVisionMesh(float range, float halfAngle)
     {
-        Mesh mesh = new Mesh();
+        meshRenderer.enabled = true;
         List<Vector3> visionPoints = GetVisionPoints(range, halfAngle);
         List<int> triangleFan = GetTriangleFan(visionPoints);
 
@@ -39,7 +46,7 @@ public class VisionMesh : MonoBehaviour
     /// Gets the vertices of the vision mesh
     /// </summary>
     /// <param name="range">Range of the vision</param>
-    /// <param name="halfAngle">Half of the vision angle</param>
+    /// <param name="halfAngle">Half of the vision's angle</param>
     /// <returns>List of the vertices in local space</returns>
     private List<Vector3> GetVisionPoints(float range, float halfAngle)
     {

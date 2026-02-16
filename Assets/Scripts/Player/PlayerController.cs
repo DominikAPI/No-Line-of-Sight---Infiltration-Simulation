@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class PlayerController : MonoBehaviour, IDetectable
+public class PlayerController : MonoBehaviour, IDetectable, IResetable
 {
     [SerializeField] private float speed;
     [SerializeField] private float slideForce;
@@ -20,6 +20,9 @@ public class PlayerController : MonoBehaviour, IDetectable
     private PistolController gun;
     private DetectionResponse detectionResponse;
 
+    public Vector3 OriginalPosition { get; set; }
+    public Quaternion OriginalRotation { get; set; }
+
     private void Awake()
     {
         playerInputActions = new PlayerInputActions();
@@ -27,6 +30,9 @@ public class PlayerController : MonoBehaviour, IDetectable
         mainCamera = Camera.main;
         gun = GetComponentInChildren<PistolController>();
         detectionResponse = new PlayerDetectionResponse();
+
+        OriginalPosition = transform.position;
+        OriginalRotation = transform.rotation;
     }
 
     private void OnEnable()
@@ -118,11 +124,24 @@ public class PlayerController : MonoBehaviour, IDetectable
 
     public DetectionResponse GetDetectionResponse() => detectionResponse;
 
+    public void FocusOn()
+    {
+        Vector3 newPosition = transform.position;
+        newPosition.z = -10f;
+        Camera.main.transform.position = newPosition;
+    }
+
     private void OnDisable()
     {
         playerInputActions.Player.Move.Disable();
         playerInputActions.Player.Slide.Disable();
         playerInputActions.Player.Look.Disable();
         playerInputActions.Player.Attack.Disable();
+    }
+
+    public void ResetObject()
+    {
+        transform.SetPositionAndRotation(OriginalPosition, OriginalRotation);
+        FocusOn();
     }
 }

@@ -11,15 +11,10 @@ public class CorpseController : MonoBehaviour, IDetectable
 
     public DetectionResponse GetDetectionResponse() => detectionResponse;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public void FocusOn()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        Vector3 newPosition = transform.position;
+        newPosition.z = -10f;
+        Camera.main.transform.position = newPosition;
     }
 }

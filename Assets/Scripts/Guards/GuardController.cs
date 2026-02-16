@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(VisionSensor))]
-public class GuardController : MonoBehaviour, IKillable
+public class GuardController : MonoBehaviour, IKillable, IResetable
 {
     [SerializeField] private GameObject corpse;
     
@@ -12,6 +12,9 @@ public class GuardController : MonoBehaviour, IKillable
 
     private readonly float checkFrequency = 0.1f;
     private float visibleTime = 0f;
+
+    public Vector3 OriginalPosition { get; set; }
+    public Quaternion OriginalRotation { get; set; }
 
     /// <summary>
     /// Initialize the guard with a <see cref="GuardEntity"/>
@@ -27,13 +30,14 @@ public class GuardController : MonoBehaviour, IKillable
         visionSensor = GetComponent<VisionSensor>();
         visionMesh = GetComponentInChildren<VisionMesh>();
         corpse.SetActive(false);
+        OriginalPosition = transform.position;
+        OriginalRotation = transform.rotation;
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        InvokeRepeating(nameof(DetectionCheck), 0f, checkFrequency);
-        InvokeRepeating(nameof(UpdateVisionMesh), 0f, checkFrequency);
+        StartGuardFunctions();
     }
 
     // Update is called once per frame
@@ -77,5 +81,22 @@ public class GuardController : MonoBehaviour, IKillable
         }
     }
 
+    /// <summary>
+    /// Starts the detection check and the vision mesh construction
+    /// </summary>
+    private void StartGuardFunctions()
+    {
+        InvokeRepeating(nameof(DetectionCheck), 0f, checkFrequency);
+        InvokeRepeating(nameof(UpdateVisionMesh), 0f, checkFrequency);
+    }
+
     private void UpdateVisionMesh() => visionMesh.ConstructVisionMesh(entity.DetectionRange, entity.HalfAngle);
+
+    public void ResetObject()
+    {
+        transform.SetPositionAndRotation(OriginalPosition, OriginalRotation);
+        corpse.SetActive(false);
+        gameObject.SetActive(true);
+        StartGuardFunctions();
+    }
 }
