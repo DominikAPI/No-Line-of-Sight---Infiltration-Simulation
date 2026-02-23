@@ -12,6 +12,7 @@ public class GuardController : MonoBehaviour, IKillable, IResetable
 
     private readonly float checkFrequency = 0.1f;
     private float visibleTime = 0f;
+    private readonly int raysPerHalfAnlge = 18;
 
     public Vector3 OriginalPosition { get; set; }
     public Quaternion OriginalRotation { get; set; }
@@ -90,7 +91,7 @@ public class GuardController : MonoBehaviour, IKillable, IResetable
         InvokeRepeating(nameof(UpdateVisionMesh), 0f, checkFrequency);
     }
 
-    private void UpdateVisionMesh() => visionMesh.ConstructVisionMesh(entity.DetectionRange, entity.HalfAngle);
+    private void UpdateVisionMesh() => visionMesh.ConstructVisionMesh(entity.DetectionRange, entity.HalfAngle, raysPerHalfAnlge);
 
     public void ResetObject()
     {
