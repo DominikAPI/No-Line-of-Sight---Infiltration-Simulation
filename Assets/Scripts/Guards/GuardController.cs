@@ -1,9 +1,11 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(VisionSensor))]
-public class GuardController : MonoBehaviour, IKillable, IResetable
+public class GuardController : MonoBehaviour, IKillable, IResetable, IPatrol
 {
+    private static readonly WaitForSeconds _waitForSeconds1_0 = new(1f);
     [SerializeField] private GameObject corpse;
     
     private GuardEntity entity;
@@ -13,6 +15,9 @@ public class GuardController : MonoBehaviour, IKillable, IResetable
     private readonly float checkFrequency = 0.1f;
     private float visibleTime = 0f;
     private readonly int raysPerHalfAnlge = 18;
+
+    private Vector3 moveDir;
+    private bool isTurning = false;
 
     public Vector3 OriginalPosition { get; set; }
     public Quaternion OriginalRotation { get; set; }
@@ -33,6 +38,7 @@ public class GuardController : MonoBehaviour, IKillable, IResetable
         corpse.SetActive(false);
         OriginalPosition = transform.position;
         OriginalRotation = transform.rotation;
+        moveDir = transform.up;
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -44,6 +50,7 @@ public class GuardController : MonoBehaviour, IKillable, IResetable
     // Update is called once per frame
     void Update()
     {
+        Patrol();
         corpse.transform.position = transform.position;
     }
 
@@ -82,6 +89,22 @@ public class GuardController : MonoBehaviour, IKillable, IResetable
         }
     }
 
+    public void Turn(float angle) => StartCoroutine(TurnRoutine(angle));
+    private IEnumerator TurnRoutine(float angle)
+    {
+        isTurning = true;
+        yield return _waitForSeconds1_0;
+
+        transform.Rotate(Vector3.forward, angle);
+        isTurning = false;
+    }
+
+    public void Patrol()
+    {
+        if (entity.Speed == 0f || isTurning) return;
+        transform.Translate(entity.Speed * Time.deltaTime * moveDir);
+    }
+
     /// <summary>
     /// Starts the detection check and the vision mesh construction
     /// </summary>
@@ -102,5 +125,10 @@ public class GuardController : MonoBehaviour, IKillable, IResetable
         corpse.transform.SetPositionAndRotation(OriginalPosition, OriginalRotation);
         gameObject.SetActive(true);
         StartGuardFunctions();
+    }
+
+    private void OnDisable()
+    {
+        CancelInvoke();
     }
 }

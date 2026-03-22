@@ -5,6 +5,8 @@ public class GuardEntity
     public float DetectionRange { get; private set; }
     public float DetectionTime { get; private set; }
 
+    public float Speed { get; private set;  }
+
     /// <summary>
     /// Half of the vision cone's apex angle
     /// </summary>
@@ -21,11 +23,12 @@ public class GuardEntity
     /// <param name="detectionRange">Range of the guard's vision</param>
     /// <param name="detectionTime">Time it takes in seconds to detect an object</param>
     /// <param name="halfAngle">Half of the vision cone's apex angle</param>
-    public GuardEntity(float detectionRange, float detectionTime, float halfAngle = 45f)
+    public GuardEntity(float detectionRange, float detectionTime, float halfAngle = 45f, float speed = 0)
     {
         DetectionRange = detectionRange;
         DetectionTime = detectionTime;
         HalfAngle = halfAngle;
+        Speed = speed;
     }
 
 

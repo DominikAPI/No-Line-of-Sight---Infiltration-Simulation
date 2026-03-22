@@ -1640,6 +1640,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 251269521797470451, guid: b8bd050cff386c7428c43735d73c01f8, type: 3}
+      propertyPath: isPatrolling
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3005684277546399460, guid: b8bd050cff386c7428c43735d73c01f8, type: 3}
       propertyPath: nextElevator
       value: 
@@ -1800,6 +1804,17 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1548193213 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: -1623994728004245761, guid: 42661974c9bcd81478844b7e83898694, type: 3}
+  m_PrefabInstance: {fileID: 278542606}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d7f3cb237804ee47ba854c3c2cc178d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GuardSpawn
 --- !u!1001 &1626951016
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2003,7 +2018,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GuardManager
   guardPrefab: {fileID: 114549151058789039, guid: 10e58f1fceb8fe547b34eb64b4f136e0, type: 3}
   guardSpawnPoints:
-  - {fileID: 171782508}
+  - {fileID: 1548193213}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

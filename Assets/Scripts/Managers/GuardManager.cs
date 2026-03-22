@@ -5,7 +5,7 @@ using UnityEngine;
 public class GuardManager : MonoBehaviour
 {
     [SerializeField] private GameObject guardPrefab;
-    [SerializeField] private List<Transform> guardSpawnPoints;
+    [SerializeField] private List<GuardSpawn> guardSpawnPoints;
     private List<IResetable> guards;
     private List<GameObject> guardObjects;
     public Action<IDetectable, string> OnDetection;
@@ -16,14 +16,14 @@ public class GuardManager : MonoBehaviour
         guards = new List<IResetable>();
         guardObjects = new List<GameObject>();
 
-        guardSpawnPoints.ForEach(point => guardObjects.Add(InstantiateGuardAtPosition(point.position, guards, point.rotation)));
+        guardSpawnPoints.ForEach(point => guardObjects.Add(InstantiateGuardAtPosition(point, guards)));
     }
 
-    private GameObject InstantiateGuardAtPosition(Vector3 position, List<IResetable> guardList, Quaternion rotation)
+    private GameObject InstantiateGuardAtPosition(GuardSpawn spawnPoint, List<IResetable> guardList)
     {
-        GuardEntity entity = GuardFactory.CreateEliteGuard();
+        GuardEntity entity = spawnPoint.CreateEntity();
         entity.OnTargetDetected += DetectionMessage;
-        var guard = Instantiate(guardPrefab, position, rotation, transform);
+        var guard = Instantiate(guardPrefab, spawnPoint.Position, spawnPoint.Rotation, transform);
         var controller = guard.GetComponentInChildren<GuardController>();
         controller.Initialize(entity);
         guardList.Add(controller);
