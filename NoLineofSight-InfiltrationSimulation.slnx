@@ -1,0 +1,4 @@
+﻿<Solution>
+  <Project Path="Model.csproj" />
+  <Project Path="Assembly-CSharp.csproj" />
+</Solution>

@@ -33,6 +33,7 @@ public class VisionMesh : MonoBehaviour
     /// <param name="offset">Optinal, adds this offset to the hit points, 0 by default</param>
     public void ConstructVisionMesh(float range, float halfAngle, int raysPerhalfAnlge, float offset = 0)
     {
+        mesh.Clear();
         meshRenderer.enabled = true;
         List<Vector3> visionPoints = GetVisionPoints(range, halfAngle, raysPerhalfAnlge, offset);
         List<int> triangleFan = GetTriangleFan(visionPoints);

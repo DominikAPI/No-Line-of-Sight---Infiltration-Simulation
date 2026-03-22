@@ -5,28 +5,25 @@ using UnityEngine;
 public class GuardManager : MonoBehaviour
 {
     [SerializeField] private GameObject guardPrefab;
+    [SerializeField] private List<Transform> guardSpawnPoints;
     private List<IResetable> guards;
+    private List<GameObject> guardObjects;
     public Action<IDetectable, string> OnDetection;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    void Awake()
     {
         guards = new List<IResetable>();
-        InstantiateGuardAtPosition(new Vector3(-3, -3), guards);
-        InstantiateGuardAtPosition(new Vector3(-5, 2.5f), guards);
+        guardObjects = new List<GameObject>();
+
+        guardSpawnPoints.ForEach(point => guardObjects.Add(InstantiateGuardAtPosition(point.position, guards, point.rotation)));
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
-    private GameObject InstantiateGuardAtPosition(Vector3 position, List<IResetable> guardList)
+    private GameObject InstantiateGuardAtPosition(Vector3 position, List<IResetable> guardList, Quaternion rotation)
     {
         GuardEntity entity = GuardFactory.CreateEliteGuard();
         entity.OnTargetDetected += DetectionMessage;
-        var guard = Instantiate(guardPrefab, position, Quaternion.identity);
+        var guard = Instantiate(guardPrefab, position, rotation, transform);
         var controller = guard.GetComponentInChildren<GuardController>();
         controller.Initialize(entity);
         guardList.Add(controller);

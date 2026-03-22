@@ -1,9 +1,13 @@
+using System;
 using UnityEngine;
 
 public class PistolController : MonoBehaviour
 {
     [SerializeField] private float range = 20.0f;
     [SerializeField] private Transform firePoint;
+
+    public Action OnShot;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -22,6 +26,9 @@ public class PistolController : MonoBehaviour
     public void Fire()
     {
         RaycastHit2D hit = Physics2D.Raycast(firePoint.position, transform.right, range);
+
+        OnShot?.Invoke();
+
         if (!hit) return;
 
         IKillable killable = hit.collider.GetComponent<IKillable>();

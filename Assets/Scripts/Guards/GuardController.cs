@@ -44,7 +44,7 @@ public class GuardController : MonoBehaviour, IKillable, IResetable
     // Update is called once per frame
     void Update()
     {
-        
+        corpse.transform.position = transform.position;
     }
 
     public void Die()
@@ -76,7 +76,7 @@ public class GuardController : MonoBehaviour, IKillable, IResetable
         foreach (var detectable in detectedObjects)
         {
             DetectionResponse response = detectable.GetDetectionResponse();
-
+            Debug.Log(visibleTime);
             if (response.ShouldTriggerAlert(visibleTime, entity))
                 entity.EnterAlertState(detectable, "Detected!");
         }
@@ -95,8 +95,11 @@ public class GuardController : MonoBehaviour, IKillable, IResetable
 
     public void ResetObject()
     {
+        visibleTime = 0;
+        Debug.Log(visibleTime);
         transform.SetPositionAndRotation(OriginalPosition, OriginalRotation);
         corpse.SetActive(false);
+        corpse.transform.SetPositionAndRotation(OriginalPosition, OriginalRotation);
         gameObject.SetActive(true);
         StartGuardFunctions();
     }

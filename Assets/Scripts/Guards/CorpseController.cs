@@ -14,7 +14,7 @@ public class CorpseController : MonoBehaviour, IDetectable
     public void FocusOn()
     {
         Vector3 newPosition = transform.position;
-        newPosition.z = -10f;
+        newPosition.z = Camera.main.transform.position.z;
         Camera.main.transform.position = newPosition;
     }
 }

@@ -7,7 +7,7 @@ public class VisionSensor : MonoBehaviour
     [SerializeField] private Transform visionPoint;
     [SerializeField] private LayerMask detectionMask;
     [SerializeField] private LayerMask visionMask;
-    private readonly int raysPerHalfAngle = 10;
+    private readonly int raysPerHalfAngle = 18;
 
     /// <summary>
     /// Scans for detectable objects within the cone defined by the parameters
@@ -55,10 +55,11 @@ public class VisionSensor : MonoBehaviour
     /// <returns></returns>
     private bool WithinAngle(Collider2D collider, float halfAngle, Vector2 visionDirection)
     {
+        float tolerance = 15f;
         Vector2 toCollider = (collider.transform.position - visionPoint.position).normalized;
 
         float dot = Vector2.Dot(visionDirection.normalized, toCollider);
-        float cosHalfFov = Mathf.Cos(halfAngle * Mathf.Deg2Rad);
+        float cosHalfFov = Mathf.Cos((halfAngle + tolerance) * Mathf.Deg2Rad);
 
         return dot >= cosHalfFov;
     }

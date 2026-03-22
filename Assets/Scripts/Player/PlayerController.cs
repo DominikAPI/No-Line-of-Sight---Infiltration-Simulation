@@ -1,4 +1,5 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -19,6 +20,7 @@ public class PlayerController : MonoBehaviour, IDetectable, IResetable
     private Camera mainCamera;
     private PistolController gun;
     private DetectionResponse detectionResponse;
+    private IInteractable interactable;
 
     public Vector3 OriginalPosition { get; set; }
     public Quaternion OriginalRotation { get; set; }
@@ -43,17 +45,9 @@ public class PlayerController : MonoBehaviour, IDetectable, IResetable
         playerInputActions.Player.Look.performed += GetLookInput;
         playerInputActions.Player.Look.canceled += GetLookInput;
         playerInputActions.Player.Attack.performed += PerformShoot;
+        playerInputActions.Player.Interact.performed += PerformInteract;
 
-        playerInputActions.Player.Move.Enable();
-        playerInputActions.Player.Slide.Enable();
-        playerInputActions.Player.Look.Enable();
-        playerInputActions.Player.Attack.Enable();
-    }
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-
+        EnablePlayerControls();
     }
 
     // Update is called once per frame
@@ -111,6 +105,12 @@ public class PlayerController : MonoBehaviour, IDetectable, IResetable
         timeSinceSlide = 0f;
     }
 
+    public void SetCheckpoint()
+    {
+        OriginalPosition = transform.position;
+        OriginalRotation = transform.rotation;
+    }
+
     private void GetLookInput(InputAction.CallbackContext context)
     {
         previousLookInput = lookInput;
@@ -124,24 +124,46 @@ public class PlayerController : MonoBehaviour, IDetectable, IResetable
 
     public DetectionResponse GetDetectionResponse() => detectionResponse;
 
-    public void FocusOn()
+    public void FocusOn() { }
+
+    private void PerformInteract(InputAction.CallbackContext context) => interactable?.Interact(this);
+
+    public void SetInteractable(IInteractable interactable) => this.interactable = interactable;
+
+    public void RemoveInteractable(IInteractable interactable)
     {
-        Vector3 newPosition = transform.position;
-        newPosition.z = -10f;
-        Camera.main.transform.position = newPosition;
+        if (this.interactable != interactable) return;
+
+        this.interactable = null;
     }
 
     private void OnDisable()
+    {
+        DisablePlayerControls();
+    }
+
+    public void ResetObject()
+    {
+        timeSinceSlide = 2f;
+        rigidBody.linearVelocity = Vector3.zero;
+        transform.SetPositionAndRotation(OriginalPosition, OriginalRotation);
+    }
+
+    public void EnablePlayerControls()
+    {
+        playerInputActions.Player.Move.Enable();
+        playerInputActions.Player.Slide.Enable();
+        playerInputActions.Player.Look.Enable();
+        playerInputActions.Player.Attack.Enable();
+        playerInputActions.Player.Interact.Enable();
+    }
+
+    public void DisablePlayerControls()
     {
         playerInputActions.Player.Move.Disable();
         playerInputActions.Player.Slide.Disable();
         playerInputActions.Player.Look.Disable();
         playerInputActions.Player.Attack.Disable();
-    }
-
-    public void ResetObject()
-    {
-        transform.SetPositionAndRotation(OriginalPosition, OriginalRotation);
-        FocusOn();
+        playerInputActions.Player.Interact.Disable();
     }
 }

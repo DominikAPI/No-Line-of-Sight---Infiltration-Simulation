@@ -3,7 +3,7 @@ using UnityEngine;
 [RequireComponent(typeof(VisionMesh))]
 public class VisionMask : MonoBehaviour
 {
-    [SerializeField] private GameObject followObject;
+    [SerializeField] private Transform followObject;
 
     private readonly float hitOffset = 0.1f;
     private readonly int raysPerHalfAnlge = 180;
@@ -19,7 +19,7 @@ public class VisionMask : MonoBehaviour
 
     private void Update()
     {
-        transform.position = followObject.transform.position;
+        transform.position = followObject.position;
         visionMesh.ConstructVisionMesh(range, halfAngle, raysPerHalfAnlge, hitOffset);
     }
 }
