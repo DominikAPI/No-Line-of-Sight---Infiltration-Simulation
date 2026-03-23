@@ -16,7 +16,6 @@ public class GuardController : MonoBehaviour, IKillable, IResetable, IPatrol
     private float visibleTime = 0f;
     private readonly int raysPerHalfAnlge = 18;
 
-    private Vector3 moveDir;
     private bool isTurning = false;
 
     public Vector3 OriginalPosition { get; set; }
@@ -36,9 +35,8 @@ public class GuardController : MonoBehaviour, IKillable, IResetable, IPatrol
         visionSensor = GetComponent<VisionSensor>();
         visionMesh = GetComponentInChildren<VisionMesh>();
         corpse.SetActive(false);
-        OriginalPosition = transform.position;
-        OriginalRotation = transform.rotation;
-        moveDir = transform.up;
+        OriginalPosition = transform.parent.position;
+        OriginalRotation = transform.parent.rotation;
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -56,7 +54,6 @@ public class GuardController : MonoBehaviour, IKillable, IResetable, IPatrol
 
     public void Die()
     {   
-        Debug.Log("Guard died");
         CancelInvoke();
         visionMesh.DestroyVisionMesh();
         corpse.SetActive(true);
@@ -83,7 +80,7 @@ public class GuardController : MonoBehaviour, IKillable, IResetable, IPatrol
         foreach (var detectable in detectedObjects)
         {
             DetectionResponse response = detectable.GetDetectionResponse();
-            Debug.Log(visibleTime);
+
             if (response.ShouldTriggerAlert(visibleTime, entity))
                 entity.EnterAlertState(detectable, "Detected!");
         }
@@ -95,14 +92,14 @@ public class GuardController : MonoBehaviour, IKillable, IResetable, IPatrol
         isTurning = true;
         yield return _waitForSeconds1_0;
 
-        transform.Rotate(Vector3.forward, angle);
+        transform.parent.Rotate(Vector3.forward, angle);
         isTurning = false;
     }
 
     public void Patrol()
     {
         if (entity.Speed == 0f || isTurning) return;
-        transform.Translate(entity.Speed * Time.deltaTime * moveDir);
+        transform.parent.position += entity.Speed * Time.deltaTime * transform.parent.up;
     }
 
     /// <summary>
@@ -119,11 +116,12 @@ public class GuardController : MonoBehaviour, IKillable, IResetable, IPatrol
     public void ResetObject()
     {
         visibleTime = 0;
-        Debug.Log(visibleTime);
-        transform.SetPositionAndRotation(OriginalPosition, OriginalRotation);
+        isTurning = false;
+        transform.parent.SetPositionAndRotation(OriginalPosition, OriginalRotation);
         corpse.SetActive(false);
         corpse.transform.SetPositionAndRotation(OriginalPosition, OriginalRotation);
         gameObject.SetActive(true);
+        CancelInvoke();
         StartGuardFunctions();
     }
 

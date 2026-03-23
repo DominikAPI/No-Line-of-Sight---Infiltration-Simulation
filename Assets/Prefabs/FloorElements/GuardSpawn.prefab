@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3586099801076132420}
   - component: {fileID: -1623994728004245761}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: GuardSpawn
   m_TagString: Untagged
   m_Icon: {fileID: 0}

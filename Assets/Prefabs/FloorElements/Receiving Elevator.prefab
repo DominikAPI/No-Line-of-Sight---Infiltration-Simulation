@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8309479681342243323}
   - component: {fileID: 4934772993872965763}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: ElevatorFloor
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -27,7 +27,7 @@ public abstract class ElevatorBase : MonoBehaviour, IInteractable
         float duration = 0.75f;
 
         Vector3 start = door.transform.position;
-        Vector3 end = start - doorDelta * Vector3.up;
+        Vector3 end = start - doorDelta * door.transform.up;
 
         yield return MoveOverTime(door.transform, start, end, duration);
     }

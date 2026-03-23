@@ -19,7 +19,12 @@ public class VisionMask : MonoBehaviour
 
     private void Update()
     {
-        transform.position = followObject.position;
+        ConstructMask(followObject.position);
+    }
+
+    public void ConstructMask(Vector3 position)
+    {
+        transform.position = position;
         visionMesh.ConstructVisionMesh(range, halfAngle, raysPerHalfAnlge, hitOffset);
     }
 }

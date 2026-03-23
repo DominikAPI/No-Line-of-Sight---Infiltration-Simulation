@@ -5,6 +5,7 @@ public class PistolController : MonoBehaviour
 {
     [SerializeField] private float range = 20.0f;
     [SerializeField] private Transform firePoint;
+    [SerializeField] private LayerMask hitMask;
 
     public Action OnShot;
 
@@ -25,7 +26,7 @@ public class PistolController : MonoBehaviour
     /// </summary>
     public void Fire()
     {
-        RaycastHit2D hit = Physics2D.Raycast(firePoint.position, transform.right, range);
+        RaycastHit2D hit = Physics2D.Raycast(firePoint.position, transform.right, range, hitMask);
 
         OnShot?.Invoke();
 

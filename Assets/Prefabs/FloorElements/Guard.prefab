@@ -49,6 +49,14 @@ PrefabInstance:
       propertyPath: corpse
       value: 
       objectReference: {fileID: 6787586867949407365}
+    - target: {fileID: 4207251798643264197, guid: 7c3d31f6e0a8bd142ab1ea9fb03c040a, type: 3}
+      propertyPath: m_BodyType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4207251798643264197, guid: 7c3d31f6e0a8bd142ab1ea9fb03c040a, type: 3}
+      propertyPath: m_Simulated
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5415044334295096983, guid: 7c3d31f6e0a8bd142ab1ea9fb03c040a, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

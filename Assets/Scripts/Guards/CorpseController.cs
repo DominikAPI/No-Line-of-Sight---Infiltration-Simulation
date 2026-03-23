@@ -17,4 +17,6 @@ public class CorpseController : MonoBehaviour, IDetectable
         newPosition.z = Camera.main.transform.position.z;
         Camera.main.transform.position = newPosition;
     }
+
+    public Vector3 GetPosition() => transform.position;
 }

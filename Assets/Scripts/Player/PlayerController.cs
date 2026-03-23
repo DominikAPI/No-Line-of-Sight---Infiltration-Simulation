@@ -126,6 +126,8 @@ public class PlayerController : MonoBehaviour, IDetectable, IResetable
 
     public void FocusOn() { }
 
+    public Vector3 GetPosition() => transform.position;
+
     private void PerformInteract(InputAction.CallbackContext context) => interactable?.Interact(this);
 
     public void SetInteractable(IInteractable interactable) => this.interactable = interactable;

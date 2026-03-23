@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TMP_Text detectedText;
     [SerializeField] private List<GameObject> floors;
     [SerializeField] private GameObject player;
+    [SerializeField] private GameObject mask;
 
     private GuardManager activeFloor;
     private PlayerController playerController;
@@ -56,6 +57,7 @@ public class GameManager : MonoBehaviour
         playerController.DisablePlayerControls();
         cameraFollow.Enabled = false;
         detectable.FocusOn();
+        mask.SetActive(false);
         detectedText.text = message;
         SetUI(true);
         Time.timeScale = 0;
@@ -68,6 +70,7 @@ public class GameManager : MonoBehaviour
         activeFloor.ResetGuards();
         cameraFollow.Enabled = true;
         playerController.EnablePlayerControls();
+        mask.SetActive(true);
         Time.timeScale = 1;
     }
 
