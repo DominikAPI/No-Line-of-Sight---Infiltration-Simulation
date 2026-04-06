@@ -1,11 +1,20 @@
 using System.Collections;
 using UnityEngine;
 
+[RequireComponent(typeof(AudioSource))]
 public abstract class ElevatorBase : MonoBehaviour, IInteractable
 {
     [SerializeField] protected GameObject door;
     [SerializeField] protected Transform standingPoint;
     [SerializeField] protected float doorDelta;
+    [SerializeField] protected AudioClip doorSound;
+
+    protected AudioSource audioSource;
+
+    private void Awake()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
 
     protected IEnumerator MoveOverTime(Transform target, Vector3 start, Vector3 end, float duration)
     {
@@ -24,11 +33,12 @@ public abstract class ElevatorBase : MonoBehaviour, IInteractable
 
     public IEnumerator OpenDoor()
     {
-        float duration = 0.75f;
+        float duration = 1.8f;
 
         Vector3 start = door.transform.position;
         Vector3 end = start - doorDelta * door.transform.up;
 
+        audioSource.PlayOneShot(doorSound);
         yield return MoveOverTime(door.transform, start, end, duration);
     }
 

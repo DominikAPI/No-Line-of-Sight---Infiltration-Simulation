@@ -9,14 +9,23 @@ public class VisionMesh : MonoBehaviour
     private MeshFilter meshFilter;
     private MeshRenderer meshRenderer;
     private Mesh mesh;
-
-    public Mesh Mesh { get => mesh; }
+    private IDetectionTimeSource source;
+    private MaterialPropertyBlock mpb;
 
     private void Awake()
     {
         meshFilter = GetComponent<MeshFilter>();
         meshRenderer = GetComponent<MeshRenderer>();
+        mpb = new MaterialPropertyBlock();
         mesh = new Mesh();
+    }
+
+    public void RegisterDetectionTimeSource(IDetectionTimeSource detectionTimeSource)
+    {
+        if (source != null) source.OnDetectionTimeChange -= SetFlashingParameters;
+
+        source = detectionTimeSource;
+        source.OnDetectionTimeChange += SetFlashingParameters;
     }
 
     public void DestroyVisionMesh()
@@ -74,7 +83,18 @@ public class VisionMesh : MonoBehaviour
             oldHit = hit;
             oldRayDirection = rayDirection;
 
-            Vector3 point = hit ? hit.point + rayDirection * offset : transform.position + (Vector3)rayDirection * range;
+            Vector3 point;
+
+            if (hit)
+            {
+                point = hit.point + hit.normal * offset;
+            }
+            else
+            {
+                point = transform.position + (Vector3)rayDirection * range;
+            }
+
+
             visionPoints.Add(transform.InverseTransformPoint(point));      
         }
 
@@ -116,7 +136,7 @@ public class VisionMesh : MonoBehaviour
     {
         List<int> triangleFan = new();
 
-        for (int i = 1;i < visionPoints.Count - 1; i++)
+        for (int i = 1; i < visionPoints.Count - 1; i++)
         {
             triangleFan.Add(0);
             triangleFan.Add(i);
@@ -124,5 +144,24 @@ public class VisionMesh : MonoBehaviour
         }
 
         return triangleFan;
-    }   
+    }
+    
+    private void SetFlashingParameters(float currentTime, float detectionTime)
+    {
+        float detectionRatio = detectionTime > 0 ? currentTime / detectionTime : 0f;
+
+        meshRenderer.GetPropertyBlock(mpb);
+        mpb.SetFloat("_Detection", detectionRatio);
+        meshRenderer.SetPropertyBlock(mpb);
+    }
+
+    private void OnEnable()
+    {
+        if (source != null) source.OnDetectionTimeChange += SetFlashingParameters;
+    }
+
+    private void OnDisable()
+    {
+        if (source != null) source.OnDetectionTimeChange -= SetFlashingParameters;
+    }
 }

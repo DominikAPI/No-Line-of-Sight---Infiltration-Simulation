@@ -1,13 +1,12 @@
-using System;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(Rigidbody2D), typeof(AudioSource))]
 public class PlayerController : MonoBehaviour, IDetectable, IResetable
 {
     [SerializeField] private float speed;
     [SerializeField] private float slideForce;
+    [SerializeField] private AudioClip footsteps;
     private readonly float slideCooldown = 2.0f;
     private float timeSinceSlide = 2.0f;
 
@@ -15,12 +14,13 @@ public class PlayerController : MonoBehaviour, IDetectable, IResetable
     private Vector2 moveInput;
     private Vector2 lookInput;
     private Vector2 previousLookInput;
-
+    private AudioSource audioSource;
     private Rigidbody2D rigidBody;
     private Camera mainCamera;
     private PistolController gun;
     private DetectionResponse detectionResponse;
     private IInteractable interactable;
+    private bool isMoving = false;
 
     public Vector3 OriginalPosition { get; set; }
     public Quaternion OriginalRotation { get; set; }
@@ -32,9 +32,11 @@ public class PlayerController : MonoBehaviour, IDetectable, IResetable
         mainCamera = Camera.main;
         gun = GetComponentInChildren<PistolController>();
         detectionResponse = new PlayerDetectionResponse();
+        audioSource = GetComponent<AudioSource>();
 
         OriginalPosition = transform.position;
         OriginalRotation = transform.rotation;
+        audioSource.clip = footsteps;
     }
 
     private void OnEnable()
@@ -68,7 +70,31 @@ public class PlayerController : MonoBehaviour, IDetectable, IResetable
         if (movement.sqrMagnitude > 1f)
             movement.Normalize();
 
+        bool wasMoving = isMoving;
+        isMoving = movement != Vector3.zero;
+        HandleFootstepSound(isMoving, wasMoving);
+
         transform.position += speed * Time.deltaTime * movement;
+    }
+
+    private void HandleFootstepSound(bool moving, bool wasMoving)
+    {
+        if (moving)
+        {
+            if (!wasMoving)
+            {
+                audioSource.loop = true;
+                audioSource.Play();
+            }
+        }
+        else
+        {
+            if (wasMoving)
+            {
+                audioSource.loop = false;
+                audioSource.Stop();
+            }
+        }
     }
 
     /// <summary>

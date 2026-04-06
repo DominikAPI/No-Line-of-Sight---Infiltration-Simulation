@@ -1,24 +1,27 @@
 using System;
 using UnityEngine;
 
+[RequireComponent(typeof(AudioSource))]
 public class PistolController : MonoBehaviour
 {
     [SerializeField] private float range = 20.0f;
     [SerializeField] private Transform firePoint;
     [SerializeField] private LayerMask hitMask;
+    [SerializeField] private AudioClip shootSound;
 
     public Action OnShot;
+    private AudioSource audioSource;
+    private readonly float fireRate = 0.1f;
+    private float cooldown = 0.1f;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private void Awake()
     {
-        
+        audioSource = GetComponent<AudioSource>();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        
+        cooldown += Time.deltaTime;
     }
 
     /// <summary>
@@ -26,8 +29,11 @@ public class PistolController : MonoBehaviour
     /// </summary>
     public void Fire()
     {
+        if (cooldown < fireRate) return;
+
         RaycastHit2D hit = Physics2D.Raycast(firePoint.position, transform.right, range, hitMask);
 
+        audioSource.PlayOneShot(shootSound);
         OnShot?.Invoke();
 
         if (!hit) return;

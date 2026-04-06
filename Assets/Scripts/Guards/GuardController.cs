@@ -1,12 +1,14 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(VisionSensor))]
-public class GuardController : MonoBehaviour, IKillable, IResetable, IPatrol
+public class GuardController : MonoBehaviour, IKillable, IResetable, IPatrol, IDetectionTimeSource
 {
     private static readonly WaitForSeconds _waitForSeconds1_0 = new(1f);
     [SerializeField] private GameObject corpse;
+    [SerializeField] private DetectionBarController detectionBar;
     
     private GuardEntity entity;
     private VisionSensor visionSensor;
@@ -17,6 +19,8 @@ public class GuardController : MonoBehaviour, IKillable, IResetable, IPatrol
     private readonly int raysPerHalfAnlge = 18;
 
     private bool isTurning = false;
+
+    public event Action<float, float> OnDetectionTimeChange;
 
     public Vector3 OriginalPosition { get; set; }
     public Quaternion OriginalRotation { get; set; }
@@ -35,6 +39,7 @@ public class GuardController : MonoBehaviour, IKillable, IResetable, IPatrol
         visionSensor = GetComponent<VisionSensor>();
         visionMesh = GetComponentInChildren<VisionMesh>();
         corpse.SetActive(false);
+        visionMesh.RegisterDetectionTimeSource(this);
         OriginalPosition = transform.parent.position;
         OriginalRotation = transform.parent.rotation;
     }
@@ -43,6 +48,7 @@ public class GuardController : MonoBehaviour, IKillable, IResetable, IPatrol
     void Start()
     {
         StartGuardFunctions();
+        detectionBar.ActivateUpdate(this);
     }
 
     // Update is called once per frame
@@ -56,6 +62,7 @@ public class GuardController : MonoBehaviour, IKillable, IResetable, IPatrol
     {   
         CancelInvoke();
         visionMesh.DestroyVisionMesh();
+        detectionBar.DeactivateUpdate(this);
         corpse.SetActive(true);
         gameObject.SetActive(false);
     }
@@ -71,19 +78,23 @@ public class GuardController : MonoBehaviour, IKillable, IResetable, IPatrol
 
         if (detectedObjects.Count == 0)
         {
-            visibleTime = 0f;
-            return;
+            visibleTime -= checkFrequency * 2f;
+            visibleTime = Mathf.Max(0, visibleTime);
         }
-
-        visibleTime += checkFrequency;
-
-        foreach (var detectable in detectedObjects)
+        else
         {
-            DetectionResponse response = detectable.GetDetectionResponse();
+            visibleTime += checkFrequency;
 
-            if (response.ShouldTriggerAlert(visibleTime, entity))
-                entity.EnterAlertState(detectable, "Detected!");
+            foreach (var detectable in detectedObjects)
+            {
+                DetectionResponse response = detectable.GetDetectionResponse();
+
+                if (response.ShouldTriggerAlert(visibleTime, entity))
+                    entity.EnterAlertState(detectable, "Detected!");
+            }
         }
+
+        OnDetectionTimeChange?.Invoke(visibleTime, entity.DetectionTime);
     }
 
     public void Turn(float angle) => StartCoroutine(TurnRoutine(angle));
@@ -121,6 +132,7 @@ public class GuardController : MonoBehaviour, IKillable, IResetable, IPatrol
         corpse.SetActive(false);
         corpse.transform.SetPositionAndRotation(OriginalPosition, OriginalRotation);
         gameObject.SetActive(true);
+        detectionBar.ActivateUpdate(this);
         CancelInvoke();
         StartGuardFunctions();
     }
@@ -128,5 +140,6 @@ public class GuardController : MonoBehaviour, IKillable, IResetable, IPatrol
     private void OnDisable()
     {
         CancelInvoke();
+        detectionBar.DeactivateUpdate(this);
     }
 }
