@@ -1,5 +1,13 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+
+[Serializable]
+public struct PlayerSaveData
+{
+    public Vector3 position;
+    public Quaternion rotation;
+}
 
 [RequireComponent(typeof(Rigidbody2D), typeof(AudioSource))]
 public class PlayerController : MonoBehaviour, IDetectable, IResetable
@@ -48,6 +56,7 @@ public class PlayerController : MonoBehaviour, IDetectable, IResetable
         playerInputActions.Player.Look.canceled += GetLookInput;
         playerInputActions.Player.Attack.performed += PerformShoot;
         playerInputActions.Player.Interact.performed += PerformInteract;
+        playerInputActions.Player.Reload.performed += Reload;
 
         EnablePlayerControls();
     }
@@ -143,10 +152,10 @@ public class PlayerController : MonoBehaviour, IDetectable, IResetable
         lookInput = context.ReadValue<Vector2>();
     }
 
-    private void PerformShoot(InputAction.CallbackContext context)
-    {
-        gun.Fire();
-    }
+    private void PerformShoot(InputAction.CallbackContext context) => gun.Fire();
+
+    private void Reload(InputAction.CallbackContext context) => StartCoroutine(gun.Reload(2.92f));
+
 
     public DetectionResponse GetDetectionResponse() => detectionResponse;
 
@@ -175,6 +184,20 @@ public class PlayerController : MonoBehaviour, IDetectable, IResetable
         timeSinceSlide = 2f;
         rigidBody.linearVelocity = Vector3.zero;
         transform.SetPositionAndRotation(OriginalPosition, OriginalRotation);
+        StartCoroutine(gun.Reload());
+    }
+
+    public void Save(ref PlayerSaveData saveData)
+    {
+        saveData.position = OriginalPosition;
+        saveData.rotation = OriginalRotation;
+    }
+
+    public void Load(PlayerSaveData loadData)
+    {
+        transform.SetPositionAndRotation(loadData.position, loadData.rotation);
+        OriginalPosition = loadData.position;
+        OriginalRotation = loadData.rotation;
     }
 
     public void EnablePlayerControls()
@@ -184,6 +207,7 @@ public class PlayerController : MonoBehaviour, IDetectable, IResetable
         playerInputActions.Player.Look.Enable();
         playerInputActions.Player.Attack.Enable();
         playerInputActions.Player.Interact.Enable();
+        playerInputActions.Player.Reload.Enable();
     }
 
     public void DisablePlayerControls()
@@ -193,5 +217,6 @@ public class PlayerController : MonoBehaviour, IDetectable, IResetable
         playerInputActions.Player.Look.Disable();
         playerInputActions.Player.Attack.Disable();
         playerInputActions.Player.Interact.Disable();
+        playerInputActions.Player.Reload.Disable();
     }
 }

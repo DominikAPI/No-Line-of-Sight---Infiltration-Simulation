@@ -10,10 +10,15 @@ Shader "Custom/DetectionBar"
 
     SubShader
     {
-        Tags { "RenderType" = "Transparent" "RenderPipeline" = "UniversalPipeline" "Queue" = "Transparent"}
+        Tags { "RenderType" = "Opaque+1" "RenderPipeline" = "UniversalPipeline" "Queue" = "Overlay+1"}
 
         Pass
         {
+            Blend SrcAlpha OneMinusSrcAlpha
+            ZWrite Off
+            ZTest Always
+            Cull Off
+
             HLSLPROGRAM
 
             #pragma vertex vert
@@ -61,7 +66,7 @@ Shader "Custom/DetectionBar"
                 half4 tex = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, IN.uv);
                 float3 finalColor = fill * color * tex.rgb;
 
-                return float4(finalColor, 1.0);
+                return half4(finalColor, tex.a);
             }
             ENDHLSL
         }
