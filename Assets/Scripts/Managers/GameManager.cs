@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 [System.Serializable]
@@ -16,6 +17,9 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
     
     [SerializeField] private Button restartButton;
+    [SerializeField] private Button exitButton;
+    [SerializeField] private Button quitButton;
+    [SerializeField] private Button continueButton;
     [SerializeField] private TMP_Text detectedText;
     [SerializeField] private List<GameObject> floors;
     [SerializeField] private GameObject player;
@@ -41,26 +45,43 @@ public class GameManager : MonoBehaviour
             activeFloor.OnDetection += HandleDetection;
 
             restartButton.onClick.AddListener(ResetFloor);
+            continueButton.onClick.AddListener(ContinueGame);
+            exitButton.onClick.AddListener(ExitGame);
+            quitButton.onClick.AddListener(QuitToMenu);
 
-            SetUI(false);
+            SetDetectionUI(false);
+            SetPauseUI(false);
         }
         else Destroy(gameObject);
         
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Start()
     {
-        if (Keyboard.current.fKey.wasPressedThisFrame)
+        if (SessionData.ContinueGame)
         {
+            SessionData.ContinueGame = false;
             SaveSystem.LoadGame();
         }
     }
 
-    private void SetUI(bool visible)
+    // Update is called once per frame
+    void Update()
+    {
+        if (Keyboard.current.escapeKey.wasPressedThisFrame) PauseGame();
+    }
+
+    private void SetDetectionUI(bool visible)
     {
         restartButton.gameObject.SetActive(visible);
         detectedText.gameObject.SetActive(visible);
+    }
+
+    private void SetPauseUI(bool visible)
+    {
+        exitButton.gameObject.SetActive(visible);
+        quitButton.gameObject.SetActive(visible);
+        continueButton.gameObject.SetActive(visible);
     }
 
     private void HandleDetection(IDetectable detectable, string message)
@@ -70,13 +91,13 @@ public class GameManager : MonoBehaviour
         detectable.FocusOn();
         mask.SetActive(false);
         detectedText.text = message;
-        SetUI(true);
+        SetDetectionUI(true);
         Time.timeScale = 0;
     }
 
     private void ResetFloor()
     {
-        SetUI(false);
+        SetDetectionUI(false);
         playerController.ResetObject();
         activeFloor.ResetGuards();
         cameraFollow.Enabled = true;
@@ -123,5 +144,27 @@ public class GameManager : MonoBehaviour
         playerController.Load(saveData.playerSaveData);
         yield return floors[floorIndex].GetComponentInChildren<ReceivingElevator>().OpenDoor();
         playerController.EnablePlayerControls();
+    }
+
+    private void PauseGame()
+    {
+        playerController.DisablePlayerControls();
+        Time.timeScale = 0f;
+        SetPauseUI(true);
+    }
+
+    private void ContinueGame()
+    {
+        Time.timeScale = 1.0f;
+        playerController.EnablePlayerControls();
+        SetPauseUI(false);
+    }
+
+    private void ExitGame() => Application.Quit();
+
+    private void QuitToMenu()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("MainMenu");
     }
 }

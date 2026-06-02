@@ -11,7 +11,7 @@ public struct SaveData
     public GameSaveData gameSaveData;
 }
 
-public class SaveSystem
+public static class SaveSystem
 {
     private static SaveData saveData = new SaveData();
     private static readonly string encryptionKey = "TyqefIuNP2peLJp7H44+bE4tGntcLomdLp54HS6Nbg==";
@@ -28,13 +28,22 @@ public class SaveSystem
         File.WriteAllText(FileName, encrypted);
     }
 
-    public static void LoadGame()
+    public static bool LoadGame()
     {
+        if (!HasSave()) return false;
         string saveContent = File.ReadAllText(FileName);
         string decrypted = DecryptString(saveContent);
         saveData = JsonUtility.FromJson<SaveData>(decrypted);
 
         GameManager.Instance.Load(saveData);
+        return true;
+    }
+
+    public static bool HasSave() => File.Exists(FileName);
+
+    public static void DeleteSave()
+    {
+        if (HasSave()) File.Delete(FileName);
     }
 
     private static string EncryptString(string original)
