@@ -49,6 +49,7 @@ public class GameManager : MonoBehaviour
             exitButton.onClick.AddListener(ExitGame);
             quitButton.onClick.AddListener(QuitToMenu);
 
+            SetMousePointer(false);
             SetDetectionUI(false);
             SetPauseUI(false);
         }
@@ -92,11 +93,13 @@ public class GameManager : MonoBehaviour
         mask.SetActive(false);
         detectedText.text = message;
         SetDetectionUI(true);
+        SetMousePointer(true);
         Time.timeScale = 0;
     }
 
     private void ResetFloor()
     {
+        SetMousePointer(false);
         SetDetectionUI(false);
         playerController.ResetObject();
         activeFloor.ResetGuards();
@@ -149,12 +152,14 @@ public class GameManager : MonoBehaviour
     private void PauseGame()
     {
         playerController.DisablePlayerControls();
+        SetMousePointer(true);
         Time.timeScale = 0f;
         SetPauseUI(true);
     }
 
     private void ContinueGame()
     {
+        SetMousePointer(false);
         Time.timeScale = 1.0f;
         playerController.EnablePlayerControls();
         SetPauseUI(false);
@@ -166,5 +171,11 @@ public class GameManager : MonoBehaviour
     {
         Time.timeScale = 1f;
         SceneManager.LoadScene("MainMenu");
+    }
+
+    private void SetMousePointer(bool visible)
+    {
+        Cursor.visible = visible;
+        Cursor.lockState = visible ? CursorLockMode.None : CursorLockMode.Confined;
     }
 }

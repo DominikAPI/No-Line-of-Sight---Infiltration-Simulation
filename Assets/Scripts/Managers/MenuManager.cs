@@ -15,11 +15,13 @@ public class MenuManager : MonoBehaviour
 
     private void Awake()
     {
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
         newGameButton.onClick.AddListener(NewGame);
         continueGameButton.onClick.AddListener(ContinueGame);
         howToButton.onClick.AddListener(LoadHowTo);
         exitButton.onClick.AddListener(ExitGame);
-        continueGameButton.enabled = SaveSystem.HasSave();
+        continueGameButton.interactable = SaveSystem.HasSave();
         instructions.gameObject.SetActive(false);
     }
 
