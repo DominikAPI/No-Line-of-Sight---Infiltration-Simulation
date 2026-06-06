@@ -16,14 +16,14 @@ https://youtu.be/Jp0Z48Dc5nU
 
 ## Features
 
--Multi-floor level design connected by elevators
--Raycasted cone of vision based detection system
--Dynamic visibility check with obstacles blocking the vision
--Stencil buffer based visibility rendering
--Loading screen free transition between floors
--Automatic encrypted save
--Custom shaders
--Patrolling enemy AI
+- Multi-floor level design connected by elevators  
+- Raycasted cone of vision based detection system  
+- Dynamic visibility check with obstacles blocking the vision  
+- Stencil buffer based visibility rendering  
+- Loading screen free transition between floors  
+- Automatic encrypted save  
+- Custom shaders  
+- Patrolling enemy AI  
 
 ## Technical Highligts
 
@@ -46,9 +46,9 @@ The guards don't just detect the player, they also detect dead guards or anythin
 
 ## Controls
 
-Movement - WASD  
-Slide - SPACE  
-Shoot - Left mouse button  
-Reload - R  
-Interact with the elevator - E  
-Pause - ESC
+- Movement - WASD  
+- Slide - SPACE  
+- Shoot - Left mouse button  
+- Reload - R  
+- Interact with the elevator - E  
+- Pause - ESC
